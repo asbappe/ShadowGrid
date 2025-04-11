@@ -23,3 +23,33 @@ An open-source threat intelligence dashboard built in Python + Streamlit. Fetche
    ```bash
    git clone https://github.com/yourusername/ThreatFeedValidator.git
    cd ThreatFeedValidator
+
+2. Install dependecies
+   ```bash
+   pip install -r requirements.txt
+
+3. Add your API keys:
+   - Copy .env.example -> .env
+   - Fill in your keys
+  
+4. Run the pipeline:
+   ```bash
+   python run.py
+
+5. Launch the dashboard:
+   ```bash
+   streamlit run dashboard/app.py
+
+---
+
+## Output
+Creates a CSV and (optionally) a SQLite DB of enriched threat intel. Looks like:
+
+| IP       | Country | ASN      | Abuse Score | VT Hits | Threat Score |
+|----------|---------|----------|-------------|---------|---------------|
+| 8.8.8.8  | US      | AS15169  | 90          | 5       | 95            |
+
+---
+
+## License
+MIT - free to use, modify, and learn from
