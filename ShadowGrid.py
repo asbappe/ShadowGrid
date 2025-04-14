@@ -69,10 +69,9 @@ st.plotly_chart(fig, use_container_width=True)
 
 # 🪤 Honeypot Hits Dashboard (moved from separate page)
 st.markdown("### 🪤 Honeypot Hits Details")
-honeypot_df = df[
-    df["source"].str.contains("Honeypot", na=False)
-    & df["path"].notna()
-].copy()
+honeypot_df = df[df["source"].str.contains("Honeypot", na=False)].copy()
+honeypot_df["path"] = honeypot_df["path"].fillna("(no path logged)")
+
 
 columns_to_show = [
     "ip", "path", "country", "region", "city", "asn", 
