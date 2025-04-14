@@ -83,7 +83,16 @@ if not honeypot_df.empty:
         title="Daily Honeypot Hits",
         labels={"date": "Date", "Hits": "Hits"},
     )
-st.plotly_chart(fig_hits, use_container_width=True)
+    fig_hits.update_layout(
+        paper_bgcolor="#111111",
+        plot_bgcolor="#111111",
+        font=dict(color="white"),
+    )
+
+    st.plotly_chart(fig_hits, use_container_width=True)
+else:
+    st.info("No Honeypot hits to display.")
+
 
 
 # Filters (moved to main page)
