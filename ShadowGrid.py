@@ -101,11 +101,18 @@ if not honeypot_df.empty:
         title="Daily Honeypot Hits",
         labels={"date": "Date", "Hits": "Hits"},
     )
+    fig_hits.update_xaxes(type='category')
+    fig_hits.update_layout(width=100)
+    
     fig_hits.update_layout(
         paper_bgcolor="#111111",
         plot_bgcolor="#111111",
         font=dict(color="white"),
+        margin=dict(l=40, r=40, t=60, b=60),
+        xaxis_title="Date",
+        yaxis_title="Hits"
     )
+
 
     st.plotly_chart(fig_hits, use_container_width=True)
 else:
