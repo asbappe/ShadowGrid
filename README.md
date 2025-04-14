@@ -144,4 +144,4 @@ Special thanks to [Streamlit](https://streamlit.io/), [Plotly](https://plotly.co
 
 ---
 
-**🔗 Let's connect on [LinkedIn]([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/austinbappe/))** — open to security roles!
+**🔗 Let's connect on [LinkedIn]([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/austinbappe/)** — open to security roles!
