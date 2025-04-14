@@ -139,9 +139,9 @@ MIT — Free for personal, academic, or professional use.
 
 ## 🤝 Credits
 
-Built by [Your Name] — aspiring cybersecurity professional.  
+Built by Austin Bappe —  Seasoned Cybersecurity Professional.  
 Special thanks to [Streamlit](https://streamlit.io/), [Plotly](https://plotly.com/), [MaxMind](https://www.maxmind.com/), and the open-source community.
 
 ---
 
-**🔗 Let's connect on [LinkedIn](https://linkedin.com/in/yourprofile)** — open to security roles!
+**🔗 Let's connect on [LinkedIn]([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/austinbappe/))** — open to security roles!
