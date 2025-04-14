@@ -1,55 +1,77 @@
 import pandas as pd
-from dotenv import load_dotenv
-import os
-
-# Local modules
 from feeds.otx_feed import get_otx_ips
 from feeds.abuseipdb_feed import get_abuseipdb_ips
+from feeds.remote_honeypot import get_remote_honeypot_hits
 from enrichment.geoip import enrich_geoip
 from enrichment.reputation import enrich_reputation
 from enrichment.scoring import calculate_threat_score
+from utils.config import OTX_API_KEY, ABUSEIPDB_API_KEY, VT_API_KEY
+import os
 
-# Load .env for API keys
-load_dotenv()
-
-OTX_API_KEY = os.getenv("OTX_API_KEY")
-ABUSEIPDB_API_KEY = os.getenv("ABUSEIPDB_API_KEY")
-VT_API_KEY = os.getenv("VT_API_KEY")
-
-if not OTX_API_KEY or not ABUSEIPDB_API_KEY or not VT_API_KEY:
-    raise Exception("Missing one or more required API keys in .env file.")
-
-# === Step 1: Fetch IPs from Threat Feeds ===
 print("Fetching IOCs from threat feeds...")
 
-otx_ips = get_otx_ips(OTX_API_KEY)
-abuse_ips = get_abuseipdb_ips(ABUSEIPDB_API_KEY)
+# Dictionaries to store sources and timestamps
+ip_sources = {}
+ip_timestamps = {}
 
-all_ips = set(otx_ips + abuse_ips)
+# OTX Feed
+print(" → Fetching IPs from OTX...")
+otx_ips = get_otx_ips(OTX_API_KEY)
+print(f"   Found {len(otx_ips)} IPs from OTX.")
+for ip in otx_ips:
+    ip_sources.setdefault(ip, set()).add('OTX')
+
+# AbuseIPDB Feed
+print(" → Fetching IPs from AbuseIPDB...")
+abuse_ips = get_abuseipdb_ips(ABUSEIPDB_API_KEY)
+print(f"   Found {len(abuse_ips)} IPs from AbuseIPDB.")
+for ip in abuse_ips:
+    ip_sources.setdefault(ip, set()).add('AbuseIPDB')
+
+# Remote Honeypot Feed
+print(" → Fetching hits from remote honeypot...")
+honeypot_df = get_remote_honeypot_hits("http://67.205.131.5:8080/all_hits")
+honeypot_ips = honeypot_df["ip"].unique().tolist()
+print(f"   Found {len(honeypot_ips)} IPs from honeypot.")
+for _, row in honeypot_df.iterrows():
+    ip = row["ip"]
+    timestamp = row["timestamp"]
+    ip_sources.setdefault(ip, set()).add('Honeypot')
+    if ip not in ip_timestamps or ip_timestamps[ip] < timestamp:
+        ip_timestamps[ip] = timestamp
+
+# Aggregate all unique IPs
+all_ips = list(ip_sources.keys())
 print(f"Fetched {len(all_ips)} unique IPs.")
 
-# === Step 2: Enrich & Score ===
-enriched_data = []
-
+# Enrichment
 print("Enriching IPs and calculating threat scores...")
+records = []
 for ip in all_ips:
-    geo_data = enrich_geoip(ip)
-    rep_data = enrich_reputation(ip, ABUSEIPDB_API_KEY, VT_API_KEY)
-    threat_score = calculate_threat_score(rep_data)
+    geo = enrich_geoip(ip)
+    rep = enrich_reputation(ip, ABUSEIPDB_API_KEY, VT_API_KEY)
+    score = calculate_threat_score(rep)
 
-    row = {
+    records.append({
         "ip": ip,
-        **geo_data,
-        **rep_data,
-        "threat_score": threat_score
-    }
-    enriched_data.append(row)
+        "country": geo.get("country"),
+        "region": geo.get("region"),
+        "city": geo.get("city"),
+        "latitude": geo.get("latitude"),   
+        "longitude": geo.get("longitude"), 
+        "asn": geo.get("asn"),
+        "abuse_score": rep.get("abuse_score"),
+        "vt_detections": rep.get("vt_detections"),
+        "threat_score": score,
+        "source": ', '.join(ip_sources[ip]),
+        "timestamp": ip_timestamps.get(ip, pd.NaT)
+})
 
-# === Step 3: Save to CSV ===
+# Convert to DataFrame
+output_df = pd.DataFrame(records)
+
+# Save CSV
 os.makedirs("output", exist_ok=True)
-output_file = "output/threatfeedvalidator_results.csv"
-
-df = pd.DataFrame(enriched_data)
-df.to_csv(output_file, index=False)
-
-print(f"\n✅ Done! Data saved to {output_file}")
+csv_path = "output/ioc_results.csv"
+output_df.to_csv(csv_path, index=False)
+print(f"Enriched data saved to {csv_path}")
