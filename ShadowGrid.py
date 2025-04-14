@@ -67,6 +67,24 @@ fig.update_traces(
 
 st.plotly_chart(fig, use_container_width=True)
 
+# 🪤 Honeypot Hits Dashboard (moved from separate page)
+st.markdown("### 🪤 Honeypot Hits Dashboard")
+
+honeypot_df = df[df["source"].str.contains("Honeypot", na=False)].copy()
+
+if not honeypot_df.empty:
+    honeypot_df["date"] = pd.to_datetime(honeypot_df["timestamp"]).dt.date
+    daily_hits = honeypot_df.groupby("date").size().reset_index(name="Hits")
+
+    fig_hits = px.bar(
+        daily_hits,
+        x="date",
+        y="Hits",
+        title="Daily Honeypot Hits",
+        labels={"date": "Date", "Hits": "Hits"},
+    )
+
+
 # Filters (moved to main page)
 st.markdown("### 🔍 Filter Indicators")
 with st.container():
