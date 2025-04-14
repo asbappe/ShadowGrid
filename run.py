@@ -38,6 +38,7 @@ for _, row in honeypot_df.iterrows():
 
     records.append({
         "ip": ip,
+        "path": row.get("path"), 
         "country": geo.get("country"),
         "region": geo.get("region"),
         "city": geo.get("city"),
