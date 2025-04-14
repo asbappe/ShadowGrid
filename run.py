@@ -34,6 +34,8 @@ for _, row in honeypot_df.iterrows():
     if rep.get("abuse_score", 0) > 0:
         sources.append("AbuseIPDB")
 
+    print(f"[+] {ip} → Score: {score} | Enriched from: {', '.join(sources)}")
+
     records.append({
         "ip": ip,
         "country": geo.get("country"),
@@ -55,18 +57,13 @@ enriched_df = pd.DataFrame(records)
 output_path = "output/ioc_results.csv"
 os.makedirs("output", exist_ok=True)
 
-# Check if enriched_df is ready before calling pd.concat
-if not enriched_df.empty:
-    combined_df = pd.concat([existing_df, enriched_df], ignore_index=True)
-    combined_df.drop_duplicates(subset=["ip", "timestamp"], inplace=True)
-else:
-    combined_df = existing_df
-
-
 if os.path.exists(output_path):
     existing_df = pd.read_csv(output_path, parse_dates=["timestamp"])
-    combined_df = pd.concat([existing_df, enriched_df], ignore_index=True)
-    combined_df.drop_duplicates(subset=["ip", "timestamp"], inplace=True)
+    if not enriched_df.empty:
+        combined_df = pd.concat([existing_df, enriched_df], ignore_index=True)
+        combined_df.drop_duplicates(subset=["ip", "timestamp"], inplace=True)
+    else:
+        combined_df = existing_df
 else:
     combined_df = enriched_df
 
