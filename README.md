@@ -113,21 +113,33 @@ Ensure port `8080` (Flask API) and `2222` (honeypot listener) are open to inboun
 
 ---
 
+refresh.sh script:
+1. Kills any existing Streamlit process
+2.  Runs git pull to get the latest ShadowGrid code
+3. Executes run.py to enrich honeypot hits
+4. Restarts the dashboard using nohup
+5. Tails the last 20 lines of streamlit.log
+6. Prints the public EC2 IP with the dashboard link
+
+How to use:
+```bash
+mv refresh.sh ~/ShadowGrid/
+chmod +x ~/ShadowGrid/refresh.sh 
+echo "alias refreshgrid='~/ShadowGrid/refresh.sh'" >> ~/.bashrc
+source ~/.bashrc
+```
+
+Now just run:
+```bash
+refreshgrid
+```
+
 ## 🗕️ Features In Progress
 
 - IOC tagging & threat categories  
 - Automated VT enrichment fallback  
 - Graph-based attacker clustering  
 - Export to STIX or MISP
-
----
-
-## 💼 Ideal Use Cases
-
-- Blue team dashboards
-- Threat intel enrichment
-- SOC analyst tooling
-- Resume portfolio showcase
 
 ---
 
