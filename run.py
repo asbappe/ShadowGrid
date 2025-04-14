@@ -55,6 +55,14 @@ enriched_df = pd.DataFrame(records)
 output_path = "output/ioc_results.csv"
 os.makedirs("output", exist_ok=True)
 
+# Check if enriched_df is ready before calling pd.concat
+if not enriched_df.empty:
+    combined_df = pd.concat([existing_df, enriched_df], ignore_index=True)
+    combined_df.drop_duplicates(subset=["ip", "timestamp"], inplace=True)
+else:
+    combined_df = existing_df
+
+
 if os.path.exists(output_path):
     existing_df = pd.read_csv(output_path, parse_dates=["timestamp"])
     combined_df = pd.concat([existing_df, enriched_df], ignore_index=True)
