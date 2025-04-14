@@ -70,6 +70,24 @@ st.plotly_chart(fig, use_container_width=True)
 # 🪤 Honeypot Hits Dashboard (moved from separate page)
 st.markdown("### 🪤 Honeypot Hits Dashboard")
 
+# Honeypot IP Table
+st.markdown("#### 🧾 Honeypot IP Details")
+
+columns_to_show = [
+    "ip", "country", "region", "city", "asn", 
+    "abuse_score", "vt_detections", "threat_score", 
+    "timestamp"
+]
+
+if not honeypot_df.empty:
+    st.dataframe(
+        honeypot_df[columns_to_show].sort_values("timestamp", ascending=False),
+        use_container_width=True
+    )
+else:
+    st.info("No honeypot events to display.")
+
+###HoneyPot Hits Bar Chart (considering deleting)
 honeypot_df = df[df["source"].str.contains("Honeypot", na=False)].copy()
 
 if not honeypot_df.empty:
