@@ -69,6 +69,7 @@ st.plotly_chart(fig, use_container_width=True)
 
 # 🪤 Honeypot Hits Dashboard (moved from separate page)
 st.markdown("### 🪤 Honeypot Hits Dashboard")
+honeypot_df = df[df["source"].str.contains("Honeypot", na=False)].copy()
 
 # Honeypot IP Table
 st.markdown("#### 🧾 Honeypot IP Details")
@@ -88,7 +89,6 @@ else:
     st.info("No honeypot events to display.")
 
 ###HoneyPot Hits Bar Chart (considering deleting)
-honeypot_df = df[df["source"].str.contains("Honeypot", na=False)].copy()
 
 if not honeypot_df.empty:
     honeypot_df["date"] = pd.to_datetime(honeypot_df["timestamp"]).dt.date
