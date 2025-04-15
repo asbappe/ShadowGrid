@@ -1,11 +1,13 @@
 import sys
-sys.path.append("/home/ubuntu/.cache/pypoetry/virtualenvs/shadowgrid-threat-fusion-ne1RmEk--py3.10")
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
 import sys
 import os
+from src.agents.rss_agent import analyze_rss_feeds
+from src.agents.portfolio_manager import run_agents
+
 
 # Set page config - must be the first Streamlit command
 st.set_page_config(page_title="ShadowGrid Dashboard", layout="wide")
