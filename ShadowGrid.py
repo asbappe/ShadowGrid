@@ -4,6 +4,32 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
+import requests
+
+# Fetch latest CVEs for Threat Fusion
+def fetch_latest_cves(limit=5):
+    try:
+        response = requests.get("https://services.nvd.nist.gov/rest/json/cves/2.0", timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        cve_items = data.get("vulnerabilities", [])[:limit]
+        result = []
+        for item in cve_items:
+            cve_id = item["cve"]["id"]
+            descriptions = item["cve"]["descriptions"]
+            description = next((d["value"] for d in descriptions if d["lang"] == "en"), "No description available")
+            metrics = item["cve"].get("metrics", {})
+            score = 0.0
+            if "cvssMetricV31" in metrics:
+                score = metrics["cvssMetricV31"][0]["cvssData"]["baseScore"]
+            elif "cvssMetricV30" in metrics:
+                score = metrics["cvssMetricV30"][0]["cvssData"]["baseScore"]
+            elif "cvssMetricV2" in metrics:
+                score = metrics["cvssMetricV2"][0]["cvssData"]["baseScore"]
+            result.append({"cve_id": cve_id, "score": score, "description": description})
+        return result
+    except Exception as e:
+        return [{"cve_id": "Error fetching CVEs", "score": "N/A", "description": str(e)}]
 
 # Add ./src to the module search path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
@@ -96,7 +122,7 @@ with tab2:
     st.title("ShadowGrid Threat Fusion")
     st.markdown("Live threat intelligence synthesized from news and vulnerability feeds.")
 
-    threats = run_agents(show_reasoning=False)
+   threats = fetch_latest_cves(limit=10)
     news = analyze_rss_feeds()
 
     if not threats and not news:
