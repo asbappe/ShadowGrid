@@ -53,6 +53,13 @@ with tab1:
     else:
         st.info("No geolocated honeypot events.")
 
+     # Honeypot Table
+    if not honeypot_df.empty:
+        st.markdown("### Honeypot Event Table")
+        st.dataframe(honeypot_df.sort_values("timestamp", ascending=False))
+    else:
+        st.info("No honeypot events found.")
+        
     # Bar Chart - Daily Honeypot Hits
     if not honeypot_df.empty:
         honeypot_df["date"] = pd.to_datetime(honeypot_df["timestamp"]).dt.date
@@ -84,12 +91,6 @@ with tab1:
         )
         st.plotly_chart(fig_timeline, use_container_width=True)
 
-    # Honeypot Table
-    if not honeypot_df.empty:
-        st.markdown("### Honeypot Event Table")
-        st.dataframe(honeypot_df.sort_values("timestamp", ascending=False))
-    else:
-        st.info("No honeypot events found.")
 
 with tab2:
     st.title("ShadowGrid Threat Fusion")
