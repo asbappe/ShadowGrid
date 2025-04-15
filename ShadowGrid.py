@@ -18,7 +18,6 @@ df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
 
 tab1, tab2 = st.tabs(["Honeypot Dashboard", "Threat Fusion"])
 with tab1:
-    with tab1:
     st.title("ShadowGrid Honeypot Dashboard")
     st.markdown("Honeypot threat feed, enriched with threat intel from OTX, VirusTotal, and AbuseIPDB.")
 
