@@ -21,37 +21,72 @@ with tab1:
     st.title("ShadowGrid Honeypot Dashboard")
     st.markdown("Honeypot threat feed, enriched with threat intel from OTX, VirusTotal, and AbuseIPDB.")
 
+    # Load and filter
+    honeypot_df = df[df["source"].str.contains("Honeypot", na=False)].copy()
+
     # Global Threat Map
     st.markdown("### Global Threat Map")
-    map_df = df.dropna(subset=["latitude", "longitude"])
+    map_df = honeypot_df.dropna(subset=["latitude", "longitude"])
+    if not map_df.empty:
+        fig = px.scatter_geo(
+            map_df,
+            lat="latitude",
+            lon="longitude",
+            hover_name="ip",
+            hover_data=["country", "asn", "threat_score", "source", "timestamp"],
+            size="threat_score",
+            color="threat_score",
+            color_continuous_scale="YlOrRd",
+            projection="natural earth"
+        )
 
-    fig = px.scatter_geo(
-        map_df,
-        lat="latitude",
-        lon="longitude",
-        hover_name="ip",
-        hover_data=["country", "asn", "threat_score", "source", "timestamp"],
-        size="threat_score",
-        color="threat_score",
-        color_continuous_scale="YlOrRd",
-        projection="natural earth"
-    )
+        fig.update_layout(
+            paper_bgcolor="#111111",
+            plot_bgcolor="#111111",
+            geo=dict(bgcolor="#111111"),
+            font=dict(color="white"),
+            title="Global Threat Map",
+            margin={"r":0,"t":40,"l":0,"b":0},
+        )
 
-    fig.update_layout(
-        paper_bgcolor="#111111",
-        plot_bgcolor="#111111",
-        geo=dict(bgcolor="#111111"),
-        font=dict(color="white"),
-        title="Global Threat Map",
-        margin={"r":0,"t":40,"l":0,"b":0},
-    )
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("No geolocated honeypot events.")
 
-    st.plotly_chart(fig, use_container_width=True)
-
-    # Honeypot Events Table
-    honeypot_df = df[df["source"].str.contains("Honeypot", na=False)].copy()
+    # Bar Chart - Daily Honeypot Hits
     if not honeypot_df.empty:
-        st.markdown("### Honeypot Events")
+        honeypot_df["date"] = pd.to_datetime(honeypot_df["timestamp"]).dt.date
+        daily_hits = honeypot_df.groupby("date").size().reset_index(name="Hits")
+
+        st.markdown("### Daily Honeypot Hits")
+        fig_hits = px.bar(daily_hits, x="date", y="Hits", labels={"date": "Date", "Hits": "Hits"})
+        fig_hits.update_layout(
+            paper_bgcolor="#111111",
+            plot_bgcolor="#111111",
+            font=dict(color="white"),
+            margin=dict(l=40, r=40, t=60, b=60),
+            xaxis_title="Date",
+            yaxis_title="Hits"
+        )
+        st.plotly_chart(fig_hits, use_container_width=True)
+
+    # Line Chart - Timeline of All IOCs
+    if "timestamp" in df.columns:
+        df["date"] = pd.to_datetime(df["timestamp"]).dt.date
+        daily_iocs = df.groupby("date").size().reset_index(name="New IOCs")
+
+        st.markdown("### Daily IOC Timeline")
+        fig_timeline = px.line(daily_iocs, x="date", y="New IOCs", markers=True)
+        fig_timeline.update_layout(
+            paper_bgcolor="#111111",
+            plot_bgcolor="#111111",
+            font=dict(color="white")
+        )
+        st.plotly_chart(fig_timeline, use_container_width=True)
+
+    # Honeypot Table
+    if not honeypot_df.empty:
+        st.markdown("### Honeypot Event Table")
         st.dataframe(honeypot_df.sort_values("timestamp", ascending=False))
     else:
         st.info("No honeypot events found.")
