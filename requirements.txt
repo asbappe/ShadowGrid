@@ -1,19 +1,4 @@
-# Web & Dashboard
-streamlit>=1.30.0
-plotly>=5.20.0
-
-# Data Handling
-pandas>=2.2.0
-numpy>=1.26.0
-
-# HTTP / APIs
-requests>=2.31.0
-
-# Geolocation / ASN enrichment (if used)
-geoip2>=4.7.0
-
-# Optional (but likely useful based on IP parsing, etc.)
-tldextract>=5.1.2
-
-# Required for Threat Fusion / Multiple Repos linking to single dashboard
-poetry
+streamlit
+pandas
+plotly
+feedparser
