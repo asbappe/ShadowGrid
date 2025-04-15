@@ -1,24 +1,19 @@
+import os
 import sys
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
-import sys
-import os
-from src.agents.rss_agent import analyze_rss_feeds
-from src.agents.portfolio_manager import run_agents
+
 # Add ./src to the module search path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
+# Import Threat Fusion agents
+from agents.rss_agent import analyze_rss_feeds
+from agents.portfolio_manager import run_agents
+
 # Set page config - must be the first Streamlit command
 st.set_page_config(page_title="ShadowGrid Dashboard", layout="wide")
-
-# Add path to the threat fusion repo (peer directory)
-sys.path.append(os.path.expanduser("../shadowgrid-threat-fusion/src"))
-
-# Import Threat Fusion agent
-from agents.portfolio_manager import run_agents
-from agents.rss_agent import analyze_rss_feeds
 
 # Load the enriched threat data
 df = pd.read_csv("output/ioc_results.csv", parse_dates=["timestamp"])
