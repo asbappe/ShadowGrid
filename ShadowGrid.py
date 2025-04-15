@@ -12,7 +12,7 @@ df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
 
 # Title & Description
 st.title("ShadowGrid Dashboard")
-st.markdown("Real-time honeypot threat feed, enriched with threat intel from OTX, VirusTotal, and AbuseIPDB.")
+st.markdown("Honeypot threat feed, enriched with threat intel from OTX, VirusTotal, and AbuseIPDB.")
 
 # Global Threat Map
 st.markdown("### Global Threat Map")
