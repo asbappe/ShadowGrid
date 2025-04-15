@@ -5,6 +5,7 @@ import plotly.express as px
 from datetime import datetime
 import sys
 import os
+sys.path.append(os.path.join(os.path.dirname(__file__), "src")) #Threat Fusion
 from src.agents.rss_agent import analyze_rss_feeds
 from src.agents.portfolio_manager import run_agents
 
