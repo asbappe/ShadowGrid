@@ -1,4 +1,4 @@
-import streamlit as st
+oimport streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
@@ -12,7 +12,7 @@ df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
 
 # Title & Description
 st.title("ShadowGrid Dashboard")
-st.markdown("Real-time threat feed intelligence from honeypots, OTX, and AbuseIPDB.")
+st.markdown("Real-time honeypot threat feed, enriched with threat intel from OTX, VirusTotal, and AbuseIPDB.")
 
 # Global Threat Map
 st.markdown("### Global Threat Map")
@@ -67,8 +67,8 @@ fig.update_traces(
 
 st.plotly_chart(fig, use_container_width=True)
 
-# 🪤 Honeypot Hits Dashboard (moved from separate page)
-st.markdown("### 🪤 Honeypot Hits Details")
+# Honeypot Hits Dashboard (moved from separate page)
+st.markdown("### Honeypot Hits Details")
 honeypot_df = df[df["source"].str.contains("Honeypot", na=False)].copy()
 honeypot_df["path"] = honeypot_df["path"].fillna("(no path logged)")
 
