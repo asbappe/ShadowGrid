@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/home/ubuntu/.cache/pypoetry/virtualenvs/shadowgrid-threat-fusion-ne1RmEk--py3.10")
 import streamlit as st
 import pandas as pd
 import plotly.express as px
