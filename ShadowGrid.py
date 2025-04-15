@@ -87,7 +87,7 @@ if not honeypot_df.empty:
 else:
     st.info("No honeypot events to display.")
 
-###HoneyPot Hits Bar Chart (considering deleting)
+###HoneyPot Hits Bar Chart
 
 if not honeypot_df.empty:
     honeypot_df["date"] = pd.to_datetime(honeypot_df["timestamp"]).dt.date
@@ -115,7 +115,7 @@ if not honeypot_df.empty:
 
     st.plotly_chart(fig_hits, use_container_width=True)
 else:
-    st.info("No Honeypot hits to display.")
+    st.info("No  to display.")
 
 # Timeline Chart of Daily IOC Counts
 if "timestamp" in df.columns:
@@ -183,4 +183,39 @@ for _, row in filtered_df.iterrows():
             st.write(f"- **VT Detections:** {row['vt_detections']}")
             st.write(f"- **Source Feeds:** {row['source']}")
             st.write(f"- **Last Seen:** {row['timestamp']}")
+
+
+import streamlit as st
+import sys
+import os
+
+# Add path to the threat fusion repo (peer directory)
+sys.path.append(os.path.expanduser("../shadowgrid-threat-fusion/src"))
+
+# Import the run_agents function
+from agents.portfolio_manager import run_agents
+
+# Layout header
+st.set_page_config(page_title="ShadowGrid Dashboard", layout="wide")
+st.title("ShadowGrid Unified Dashboard")
+
+# Tabs for different views
+tab1, tab2 = st.tabs(["Honeypot Hits", "Threat Fusion"])
+
+with tab1:
+    st.subheader("Honeypot Hits")
+    st.write("Your honeypot visualization code goes here...")
+
+with tab2:
+    st.subheader("Threat Fusion Feed")
+    threats = run_agents(show_reasoning=False)
+
+    if not threats:
+        st.info("No threats detected.")
+    else:
+        for threat in threats:
+            st.markdown(f"**{threat['Threat']}**")
+            st.text(f"Score: {threat['Score']} | Impact: {threat.get('Impact')}")
+            st.text(threat['Reasoning'])
+            st.markdown("---")
 
