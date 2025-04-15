@@ -117,6 +117,14 @@ if not honeypot_df.empty:
 else:
     st.info("No Honeypot hits to display.")
 
+# Timeline Chart of Daily IOC Counts
+if "timestamp" in df.columns:
+    df['date'] = pd.to_datetime(df['timestamp']).dt.date
+    daily_counts = df.groupby('date').size().reset_index(name='New IOCs')
+
+    st.markdown("### 📈 Daily IOC Timeline")
+    fig = px.line(daily_counts, x="date", y="New IOCs", markers=True)
+    st.plotly_chart(fig, use_container_width=True)
 
 
 # Filters (moved to main page)
@@ -176,11 +184,3 @@ for _, row in filtered_df.iterrows():
             st.write(f"- **Source Feeds:** {row['source']}")
             st.write(f"- **Last Seen:** {row['timestamp']}")
 
-# Timeline Chart of Daily IOC Counts
-if "timestamp" in df.columns:
-    df['date'] = pd.to_datetime(df['timestamp']).dt.date
-    daily_counts = df.groupby('date').size().reset_index(name='New IOCs')
-
-    st.markdown("### 📈 Daily IOC Timeline")
-    fig = px.line(daily_counts, x="date", y="New IOCs", markers=True)
-    st.plotly_chart(fig, use_container_width=True)
