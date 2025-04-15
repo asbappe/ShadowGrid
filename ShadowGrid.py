@@ -8,6 +8,7 @@ import requests
 
 # Fetch latest CVEs for Threat Fusion
 def fetch_latest_cves(limit=5):
+    import requests
     try:
         response = requests.get("https://services.nvd.nist.gov/rest/json/cves/2.0", timeout=10)
         response.raise_for_status()
@@ -26,10 +27,20 @@ def fetch_latest_cves(limit=5):
                 score = metrics["cvssMetricV30"][0]["cvssData"]["baseScore"]
             elif "cvssMetricV2" in metrics:
                 score = metrics["cvssMetricV2"][0]["cvssData"]["baseScore"]
-            result.append({"cve_id": cve_id, "score": score, "description": description})
+            result.append({
+                "Threat": cve_id,
+                "Score": score,
+                "Impact": description,
+                "Reasoning": ""
+            })
         return result
     except Exception as e:
-        return [{"cve_id": "Error fetching CVEs", "score": "N/A", "description": str(e)}]
+        return [{
+            "Threat": "Error fetching CVEs",
+            "Score": "N/A",
+            "Impact": str(e),
+            "Reasoning": ""
+        }]
 
 # Add ./src to the module search path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
@@ -122,7 +133,7 @@ with tab2:
     st.title("ShadowGrid Threat Fusion")
     st.markdown("Live threat intelligence synthesized from news and vulnerability feeds.")
 
-   threats = fetch_latest_cves(limit=10)
+    threats = fetch_latest_cves(limit=10)
     news = analyze_rss_feeds()
 
     if not threats and not news:
