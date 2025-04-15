@@ -14,3 +14,6 @@ geoip2>=4.7.0
 
 # Optional (but likely useful based on IP parsing, etc.)
 tldextract>=5.1.2
+
+# Required for Threat Fusion / Multiple Repos linking to single dashboard
+poetry
