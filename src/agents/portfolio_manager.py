@@ -1,8 +1,7 @@
 import requests
-from datetime import datetime, timedelta
 
-def fetch_recent_cves(days=3):
-    url = f"https://cve.circl.lu/api/last"
+def fetch_recent_cves():
+    url = "https://cve.circl.lu/api/last"
     try:
         response = requests.get(url, timeout=5)
         if response.ok:
@@ -16,12 +15,26 @@ def run_agents(show_reasoning=False):
     threats = []
 
     for cve in cves:
-        threat = {
-            "Threat": cve.get("id", "Unknown CVE"),
-            "Score": round(cve.get("cvss", 0.0), 1),
-            "Impact": cve.get("summary", "No summary available"),
-            "Reasoning": f"CVSS score of {cve.get('cvss', 0.0)} from CIRCL API"
-        }
-        threats.append(threat)
+        cve_id = cve.get("id") or "Unknown CVE"
+        summary = cve.get("summary") or "No description available"
+        score = cve.get("cvss")
+        if score is None:
+            score = 0.0
 
-    return threats[:10]  # Limit to 10 most recent
+        # Skip obviously broken CVEs with no info
+        if cve_id == "Unknown CVE" and summary.startswith("No description"):
+            continue
+
+        threats.append({
+            "Threat": cve_id,
+            "Score": round(score, 1),
+            "Impact": summary,
+            "Reasoning": f"CVSS score of {score} from CIRCL API"
+        })
+
+    return threats[:10] if threats else [{
+        "Threat": "No CVEs found",
+        "Score": 0.0,
+        "Impact": "CIRCL returned no usable data",
+        "Reasoning": "Check internet access or API status"
+    }]
