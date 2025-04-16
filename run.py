@@ -19,10 +19,21 @@ print("🔍 Loading OTX feed for enrichment...")
 otx_ips = set(get_otx_ips(OTX_API_KEY))
 print(f"OTX feed loaded: {len(otx_ips)} IPs")
 
+# Load existing IOCs if present
+output_path = "output/ioc_results.csv"
+existing_entries = set()
+
+if os.path.exists(output_path):
+    existing_df = pd.read_csv(output_path, parse_dates=["timestamp"])
+    existing_entries = set(zip(existing_df["ip"], existing_df["timestamp"].astype(str)))
+
 records = []
 for _, row in honeypot_df.iterrows():
     ip = row["ip"]
-    timestamp = row["timestamp"]
+    timestamp = str(row["timestamp"])
+
+    if (ip, timestamp) in existing_entries:
+        continue  # Skip already processed entries
 
     geo = enrich_geoip(ip)
     rep = enrich_reputation(ip, ABUSEIPDB_API_KEY, VT_API_KEY)
