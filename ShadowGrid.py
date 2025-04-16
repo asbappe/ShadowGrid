@@ -26,21 +26,22 @@ def sanitize_input(user_input):
     return re.sub(r'[^a-zA-Z0-9\-_. ]+', '', user_input)
 
 # Function to fetch filtered CVEs
-def fetch_filtered_cves(query=None, start_date=None, end_date=None):
+def fetch_filtered_cves(query=None, start_date=None, end_date=None, severity="CRITICAL"):
     base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0"
     today = datetime.utcnow()
-    default_start = today - timedelta(days=7)  # Default to last 7 days
+    default_start = today - timedelta(days=7)
     pub_start = start_date or default_start
     pub_end = end_date or today
 
     params = {
-        "cvssV3Severity": "HIGH",
         "pubStartDate": pub_start.strftime("%Y-%m-%dT00:00:00.000Z"),
         "pubEndDate": pub_end.strftime("%Y-%m-%dT23:59:59.999Z"),
         "resultsPerPage": 25
     }
     if query:
         params["keywordSearch"] = sanitize_input(query)
+    if severity:
+        params["cvssV3Severity"] = severity
 
     try:
         response = requests.get(base_url, params=params, timeout=10)
@@ -189,14 +190,16 @@ with tab2:
     st.title("ShadowGrid Threat Fusion")
     st.markdown("Live threat intelligence synthesized from news and vulnerability feeds.")
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         search_term = st.text_input("Search CVEs (optional keyword)", "")
     with col2:
         start = st.date_input("Start Date", value=datetime.utcnow() - timedelta(days=7))
         end = st.date_input("End Date", value=datetime.utcnow())
+    with col3:
+        severity = st.selectbox("Severity", options=["", "LOW", "MEDIUM", "HIGH", "CRITICAL"], index=4)
 
-    threats = fetch_filtered_cves(query=search_term if search_term else None, start_date=start, end_date=end)
+    threats = fetch_filtered_cves(query=search_term if search_term else None, start_date=start, end_date=end, severity=severity or "CRITICAL")
     news = analyze_rss_feeds()
 
     if not threats and not news:
