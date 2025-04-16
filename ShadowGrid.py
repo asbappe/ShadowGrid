@@ -11,6 +11,24 @@ from collections import defaultdict
 # Set page config - must be the first Streamlit command
 st.set_page_config(page_title="ShadowGrid Dashboard", layout="wide")
 
+# Load SpaCy model once
+nlp = spacy.load("en_core_web_sm")
+
+def auto_tag_articles(articles):
+    tag_to_articles = defaultdict(list)
+
+    for article in articles:
+        doc = nlp(article["Threat"])
+        tags = set(ent.text for ent in doc.ents if ent.label_ in ("ORG", "PRODUCT", "GPE"))
+
+        if not tags:
+            tags = {"Other"}
+
+        for tag in tags:
+            tag_to_articles[tag].append(article)
+
+    return tag_to_articles
+    
 # Add path to the threat fusion repo (peer directory)
 sys.path.append(os.path.expanduser("../shadowgrid-threat-fusion/src"))
 
@@ -89,24 +107,6 @@ df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
 
 from collections import defaultdict
 import spacy
-
-# Load SpaCy model once
-nlp = spacy.load("en_core_web_sm")
-
-def auto_tag_articles(articles):
-    tag_to_articles = defaultdict(list)
-
-    for article in articles:
-        doc = nlp(article["Threat"])
-        tags = set(ent.text for ent in doc.ents if ent.label_ in ("ORG", "PRODUCT", "GPE"))
-
-        if not tags:
-            tags = {"Other"}
-
-        for tag in tags:
-            tag_to_articles[tag].append(article)
-
-    return tag_to_articles
 
 # Tabs for different views
 tab1, tab2, tab3 = st.tabs(["Honeypot Dashboard", "Threat Fusion", "ShadowWire News"])
