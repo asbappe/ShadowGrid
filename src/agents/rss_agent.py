@@ -1,4 +1,4 @@
-from tools.rss_parser import fetch_rss_headlines
+from ..tools.rss_parser import fetch_rss_headlines
 
 def analyze_rss_feeds():
     headlines = fetch_rss_headlines()
