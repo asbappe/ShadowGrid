@@ -87,6 +87,27 @@ def fetch_filtered_cves(query=None, start_date=None, end_date=None, severity=Non
 df = pd.read_csv("output/ioc_results.csv", parse_dates=["timestamp"])
 df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
 
+from collections import defaultdict
+import spacy
+
+# Load SpaCy model once
+nlp = spacy.load("en_core_web_sm")
+
+def auto_tag_articles(articles):
+    tag_to_articles = defaultdict(list)
+
+    for article in articles:
+        doc = nlp(article["Threat"])
+        tags = set(ent.text for ent in doc.ents if ent.label_ in ("ORG", "PRODUCT", "GPE"))
+
+        if not tags:
+            tags = {"Other"}
+
+        for tag in tags:
+            tag_to_articles[tag].append(article)
+
+    return tag_to_articles
+
 # Tabs for different views
 tab1, tab2, tab3 = st.tabs(["Honeypot Dashboard", "Threat Fusion", "ShadowWire News"])
 
