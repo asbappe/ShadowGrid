@@ -168,26 +168,18 @@ with tab3:
 
     news = analyze_rss_feeds()
 
-    # Extract topics
-    topic_to_articles = defaultdict(list)
-    keyword_list = ["Fortinet", "FortiGate", "Cisco", "SentinelOne", "CrowdStrike", "Windows 11", "Linux", "Microsoft", "Apple", "Netskope", "Mimecast", "Palo Alto", "Sophos", "Check Point", "MITRE", "Okta", "Nintendo"]
+    if not news:
+        st.info("No news available.")
+    else:
+        st.markdown("### 🔍 Filter by Topic")
+        topic_articles = auto_tag_articles(news)
+        selected_tag = st.selectbox("Filter by Topic", ["All"] + sorted(topic_articles.keys()))
 
-    for item in news:
-        matched = False
-        for kw in keyword_list:
-            if kw.lower() in item["Threat"].lower():
-                topic_to_articles[kw].append(item)
-                matched = True
-        if not matched:
-            topic_to_articles["Other"].append(item)
+        display_articles = news if selected_tag == "All" else topic_articles[selected_tag]
 
-    # Topic filter UI
-    selected_topic = st.selectbox("Filter by Topic", options=["All"] + sorted(topic_to_articles.keys()))
-
-    st.markdown("### Live Security Headlines")
-    articles_to_show = news if selected_topic == "All" else topic_to_articles[selected_topic]
-
-    for item in articles_to_show:
-        st.markdown(f"**{item['Threat']}**")
-        st.markdown(f"[{item['Source']}]({item.get('link', '')})")
-        st.markdown("---")
+        for item in display_articles:
+            st.markdown(f"**{item['Threat']}**")
+            source_display = item.get('Source', 'Unknown Source')
+            link = item.get('link', '#')
+            st.markdown(f"[{source_display}]({link})")
+            st.markdown("---")
