@@ -1,4 +1,5 @@
 import feedparser
+import requests
 
 def fetch_rss_headlines():
     feeds = {
@@ -20,13 +21,14 @@ def fetch_rss_headlines():
     headlines = []
     for name, url in feeds.items():
         try:
-            feed = feedparser.parse(url)
-            for entry in feed.entries[:5]:  # Limit to top 5 per feed
+            response = requests.get(url, timeout=5)  # Add timeout here
+            feed = feedparser.parse(response.content)
+            for entry in feed.entries[:5]:
                 headlines.append({
                     "title": entry.title,
                     "link": entry.link,
                     "source": name
                 })
         except Exception as e:
-            print(f"Failed to parse feed: {name} ({url}) - {e}")
+            print(f"[!] Failed to load feed from {name} ({url}): {e}")
     return headlines
