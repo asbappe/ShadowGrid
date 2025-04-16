@@ -9,6 +9,7 @@ def analyze_rss_feeds():
             "Score": 6.0,
             "Reasoning": f"Headline from {h['source']}: {h['title']}",
             "Source": h["source"],
-            "link": h.get("link", "")
+            "link": h["link"]  # <<< Add this line
         })
     return threats
+
