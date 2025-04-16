@@ -79,6 +79,7 @@ if os.path.exists(output_path):
 else:
     combined_df = enriched_df
 
+combined_df["timestamp"] = pd.to_datetime(combined_df["timestamp"], errors="coerce")
 combined_df.sort_values("timestamp", ascending=False, inplace=True)
 combined_df.to_csv(output_path, index=False)
 print(f"✅ Enriched honeypot IOCs saved to {output_path}")
