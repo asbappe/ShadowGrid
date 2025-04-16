@@ -24,10 +24,10 @@ except ModuleNotFoundError:
 def fetch_filtered_cves(query=None):
     base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0"
     today = datetime.utcnow()
-    seven_days_ago = today - timedelta(days=7)
+    thirty_days_ago = today - timedelta(days=30)
     params = {
         "cvssV3Severity": "HIGH",
-        "pubStartDate": seven_days_ago.strftime("%Y-%m-%dT00:00:00.000Z"),
+        "pubStartDate": thirty_days_ago.strftime("%Y-%m-%dT00:00:00.000Z"),
         "pubEndDate": today.strftime("%Y-%m-%dT23:59:59.999Z"),
         "resultsPerPage": 10
     }
@@ -44,6 +44,7 @@ def fetch_filtered_cves(query=None):
             cve_id = item["cve"]["id"]
             descriptions = item["cve"].get("descriptions", [])
             description = next((d["value"] for d in descriptions if d["lang"] == "en"), "No description available")
+            published = item["cve"].get("published", "Unknown Date")
             metrics = item["cve"].get("metrics", {})
             score = 0.0
             if "cvssMetricV31" in metrics:
@@ -56,6 +57,7 @@ def fetch_filtered_cves(query=None):
                 "Threat": cve_id,
                 "Score": score,
                 "Impact": description,
+                "Published": published,
                 "Reasoning": ""
             })
         return result
@@ -64,6 +66,7 @@ def fetch_filtered_cves(query=None):
             "Threat": "Error fetching CVEs",
             "Score": "N/A",
             "Impact": str(e),
+            "Published": "N/A",
             "Reasoning": ""
         }]
 
@@ -189,7 +192,7 @@ with tab2:
             st.markdown("### CVE + Agent Intelligence")
             for threat in threats:
                 st.markdown(f"**{threat['Threat']}**")
-                st.text(f"Score: {threat['Score']} | Impact: {threat.get('Impact')}")
+                st.text(f"Score: {threat['Score']} | Published: {threat.get('Published')} | Impact: {threat.get('Impact')}")
                 st.text(threat['Reasoning'])
                 st.markdown("---")
 
