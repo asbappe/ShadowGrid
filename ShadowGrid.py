@@ -16,6 +16,7 @@ hide_streamlit_style = """
     <style>
     [data-testid="stSidebar"] {display: none;}
     [data-testid="collapsedControl"] {display: none;}
+    [data-testid="collapsedControl"] {display: none !important;}
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
