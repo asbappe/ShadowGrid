@@ -87,7 +87,7 @@ df = pd.read_csv("output/ioc_results.csv", parse_dates=["timestamp"])
 df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
 
 # Tabs for different views
-tab1, tab2 = st.tabs(["Honeypot Dashboard", "Threat Fusion"])
+tab1, tab2, tab3 = st.tabs(["Honeypot Dashboard", "Threat Fusion", "ShadowWire News"])
 
 # === Honeypot Dashboard === #
 with tab1:
@@ -134,7 +134,7 @@ with tab1:
 # === Threat Fusion Tab === #
 with tab2:
     st.title("ShadowGrid Threat Fusion")
-    st.markdown("Live threat intelligence synthesized from news and vulnerability feeds.")
+    st.markdown("Live threat intelligence synthesized from recent CVE activity and AI agents.")
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -149,22 +149,28 @@ with tab2:
     severity_filter = severity if severity.strip() else None
 
     threats = fetch_filtered_cves(query=search_query, start_date=start, end_date=end, severity=severity_filter)
-    news = analyze_rss_feeds()
 
-    if not threats and not news:
-        st.info("No threats or news available.")
+    if not threats:
+        st.info("No threats available.")
     else:
-        if threats:
-            st.markdown("### CVE + Agent Intelligence")
-            for threat in threats:
-                st.markdown(f"**{threat['Threat']}**")
-                st.text(f"Score: {threat['Score']} | Published: {threat.get('Published')} | Impact: {threat.get('Impact')}")
-                st.text(threat['Reasoning'])
-                st.markdown("---")
+        st.markdown("### CVE + Agent Intelligence")
+        for threat in threats:
+            st.markdown(f"**{threat['Threat']}**")
+            st.text(f"Score: {threat['Score']} | Published: {threat.get('Published')} | Impact: {threat.get('Impact')}")
+            st.text(threat['Reasoning'])
+            st.markdown("---")
 
-        if news:
-            st.markdown("### Live Security Headlines")
-            for item in news:
-                st.markdown(f"**{item['Threat']}**")
-                st.markdown(f"[{item['Source']}]({item.get('link', '#')})")
-                st.markdown("---")
+# === ShadowWire News Tab === #
+with tab3:
+    st.title("ShadowWire News")
+    st.markdown("Curated cybersecurity headlines from global sources.")
+
+    news = analyze_rss_feeds()
+    if not news:
+        st.info("No news available.")
+    else:
+        st.markdown("### Live Security Headlines")
+        for item in news:
+            st.markdown(f"**{item['Threat']}**")
+            st.markdown(f"[{item['Source']}]({item.get('link', '#')})")
+            st.markdown("---")
