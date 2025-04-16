@@ -6,6 +6,7 @@ import sys
 import os
 import requests
 import re
+from collections import defaultdict
 
 # Set page config - must be the first Streamlit command
 st.set_page_config(page_title="ShadowGrid Dashboard", layout="wide")
@@ -166,13 +167,27 @@ with tab3:
     st.markdown("Curated cybersecurity headlines from global sources.")
 
     news = analyze_rss_feeds()
-    if not news:
-        st.info("No news available.")
-    else:
-        st.markdown("### Live Security Headlines")
-        for item in news:
-            url = item.get("link", "")
-            if url:
-                st.markdown(f"**{item['Threat']}**")
-                st.markdown(f"[{item['Source']}]({url})")
-                st.markdown("---")
+
+    # Extract topics
+    topic_to_articles = defaultdict(list)
+    keyword_list = ["Fortinet", "FortiGate", "Cisco", "SentinelOne", "CrowdStrike", "Windows 11", "Linux", "Microsoft", "Apple", "Netskope", "Mimecast", "Palo Alto", "Sophos", "Check Point", "MITRE", "Okta", "Nintendo"]
+
+    for item in news:
+        matched = False
+        for kw in keyword_list:
+            if kw.lower() in item["Threat"].lower():
+                topic_to_articles[kw].append(item)
+                matched = True
+        if not matched:
+            topic_to_articles["Other"].append(item)
+
+    # Topic filter UI
+    selected_topic = st.selectbox("Filter by Topic", options=["All"] + sorted(topic_to_articles.keys()))
+
+    st.markdown("### Live Security Headlines")
+    articles_to_show = news if selected_topic == "All" else topic_to_articles[selected_topic]
+
+    for item in articles_to_show:
+        st.markdown(f"**{item['Threat']}**")
+        st.markdown(f"[{item['Source']}]({item.get('link', '')})")
+        st.markdown("---")
