@@ -36,9 +36,10 @@ def auto_tag_articles(articles):
 sys.path.append(os.path.expanduser("../shadowgrid-threat-fusion/src"))
 
 # Import Threat Fusion agent
-from agents.portfolio_manager import run_agents
+from src.agents.portfolio_manager import run_agents
 try:
-    from agents.rss_agent import analyze_rss_feeds
+   from src.agents.rss_agent import analyze_rss_feeds
+
 except ModuleNotFoundError:
     def analyze_rss_feeds():
         return []
