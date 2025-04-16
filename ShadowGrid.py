@@ -199,9 +199,10 @@ with tab3:
 
         display_articles = news if selected_tag == "All" else topic_articles[selected_tag]
 
-        for item in display_articles:
-            st.markdown(f"**{item['Threat']}**")
-            source_display = item.get('Source', 'Unknown Source')
-            link = item.get('link', '#')
-            st.markdown(f"[{source_display}]({link})")
-            st.markdown("---")
+for item in display_articles:
+    source = item.get('Source', 'Unknown Source')
+    title = item.get('Threat', 'No Title')
+    link = item.get('link', '#')
+    st.markdown(f"[{source} – {title}]({link})")
+
+
