@@ -14,12 +14,21 @@ st.set_page_config(page_title="ShadowGrid Dashboard", layout="wide")
 # Hide the sidebar completely
 hide_streamlit_style = """
     <style>
-    [data-testid="stSidebar"] {display: none;}
-    [data-testid="collapsedControl"] {display: none;}
-    [data-testid="collapsedControl"] {display: none !important;}
+    [data-testid="stSidebar"] {
+        display: none !important;
+    }
+    [data-testid="collapsedControl"] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0px !important;
+        height: 0px !important;
+        position: absolute !important;
+        z-index: -9999 !important;
+    }
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 
 # Make links white via CSS
 st.markdown("""
