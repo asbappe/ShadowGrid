@@ -12,6 +12,9 @@ from collections import defaultdict
 st.set_page_config(page_title="ShadowGrid Dashboard", layout="wide")
 
 # Load SpaCy model once
+from collections import defaultdict
+import spacy
+
 nlp = spacy.load("en_core_web_sm")
 
 def auto_tag_articles(articles):
@@ -104,9 +107,6 @@ def fetch_filtered_cves(query=None, start_date=None, end_date=None, severity=Non
 # Load the enriched threat data
 df = pd.read_csv("output/ioc_results.csv", parse_dates=["timestamp"])
 df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
-
-from collections import defaultdict
-import spacy
 
 # Tabs for different views
 tab1, tab2, tab3 = st.tabs(["Honeypot Dashboard", "Threat Fusion", "ShadowWire News"])
