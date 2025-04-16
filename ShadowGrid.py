@@ -11,6 +11,15 @@ from collections import defaultdict
 # Set page config - must be the first Streamlit command
 st.set_page_config(page_title="ShadowGrid Dashboard", layout="wide")
 
+# Hide the sidebar completely
+hide_streamlit_style = """
+    <style>
+    [data-testid="stSidebar"] {display: none;}
+    [data-testid="collapsedControl"] {display: none;}
+    </style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 # Make links white via CSS
 st.markdown("""
     <style>
