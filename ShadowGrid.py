@@ -171,6 +171,8 @@ with tab3:
     else:
         st.markdown("### Live Security Headlines")
         for item in news:
-            st.markdown(f"**{item['Threat']}**")
-            st.markdown(f"[{item['Source']}]({item.get('link', '')})")
-            st.markdown("---")
+            url = item.get("link", "")
+            if url:
+                st.markdown(f"**{item['Threat']}**")
+                st.markdown(f"[{item['Source']}]({url})")
+                st.markdown("---")
