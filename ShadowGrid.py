@@ -11,6 +11,19 @@ from collections import defaultdict
 # Set page config - must be the first Streamlit command
 st.set_page_config(page_title="ShadowGrid Dashboard", layout="wide")
 
+# Make links white via CSS
+st.markdown("""
+    <style>
+    a {
+        color: white !important;
+        text-decoration: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Load SpaCy model once
 from collections import defaultdict
 import spacy
