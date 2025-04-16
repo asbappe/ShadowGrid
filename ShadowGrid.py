@@ -145,7 +145,6 @@ with tab2:
     with col3:
         severity = st.selectbox("Severity", options=["", "LOW", "MEDIUM", "HIGH", "CRITICAL"], index=4)
 
-    # Only apply filters if user changes them
     search_query = search_term if search_term.strip() else None
     severity_filter = severity if severity.strip() else None
 
