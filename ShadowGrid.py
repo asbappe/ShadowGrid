@@ -29,7 +29,7 @@ def sanitize_input(user_input):
 def fetch_filtered_cves(query=None, start_date=None, end_date=None):
     base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0"
     today = datetime.utcnow()
-    default_start = today - timedelta(days=30)
+    default_start = today - timedelta(days=7)  # Default to last 7 days
     pub_start = start_date or default_start
     pub_end = end_date or today
 
@@ -193,7 +193,7 @@ with tab2:
     with col1:
         search_term = st.text_input("Search CVEs (optional keyword)", "")
     with col2:
-        start = st.date_input("Start Date", value=datetime.utcnow() - timedelta(days=30))
+        start = st.date_input("Start Date", value=datetime.utcnow() - timedelta(days=7))
         end = st.date_input("End Date", value=datetime.utcnow())
 
     threats = fetch_filtered_cves(query=search_term if search_term else None, start_date=start, end_date=end)
