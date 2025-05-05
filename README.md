@@ -6,27 +6,26 @@ ShadowGrid is a cybersecurity analytics platform that combines a custom honeypot
 
 ## 🏗️ Project Structure
 
-| Path                        | Description                             |
-| --------------------------- | --------------------------------------- |
-| `ShadowGrid.py`             | Streamlit dashboard application         |
-| `requirements.txt`          | Python dependencies                     |
-| `honeypot/`                 | Honeypot engine and configuration       |
-| `honeypot/honeypot.py`      | Custom network listener + ingest client |
-| `honeypot/config.yaml`      | Ports, logging, and API settings        |
-| `feeds/`                    | Threat feed adapters                    |
-| `feeds/abuseipdb_feed.py`   | AbuseIPDB ingestion adapter             |
-| `feeds/otx_feed.py`         | AlienVault OTX ingestion adapter        |
-| `feeds/remote_honeypot.py`  | Internal honeypot ingestion stub        |
-| `enrichment/`               | Data enrichment modules                 |
-| `enrichment/geoip.py`       | GeoIP lookup module                     |
-| `enrichment/reputation.py`  | Threat reputation scoring               |
-| `enrichment/scoring.py`     | IOC freshness and scoring               |
-| `systemd/`                  | Example systemd unit files              |
-| `systemd/streamlit.service` | Streamlit dashboard systemd service     |
-| `systemd/honeypot.service`  | Honeypot systemd service                |
-| `refresh.sh`                | Auto-update & restart script            |
-
----
+```
+ShadowGrid/
+├── ShadowGrid.py             ← Streamlit dashboard application
+├── requirements.txt          ← Python dependencies
+├── honeypot/                 ← Honeypot engine and configuration
+│   ├── honeypot.py           ← Custom network listener + ingest client
+│   └── config.yaml           ← Ports, logging, and API settings
+├── feeds/                    ← Threat feed adapters
+│   ├── abuseipdb_feed.py     ← AbuseIPDB ingestion adapter
+│   ├── otx_feed.py           ← AlienVault OTX ingestion adapter
+│   └── remote_honeypot.py    ← Internal honeypot ingestion stub
+├── enrichment/               ← Data enrichment modules
+│   ├── geoip.py              ← GeoIP lookup module
+│   ├── reputation.py         ← Threat reputation scoring
+│   └── scoring.py            ← IOC freshness and scoring
+├── systemd/                  ← Example systemd unit files
+│   ├── streamlit.service     ← Streamlit dashboard systemd service
+│   └── honeypot.service      ← Honeypot systemd service
+└── refresh.sh                ← Auto-update & restart script
+```
 
 ## 📊 Key Features
 
