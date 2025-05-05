@@ -1,4 +1,18 @@
 import os
+import os
+from pathlib import Path
+
+# Manually load .env into the environment
+env_path = Path(__file__).parent / ".env"
+if env_path.exists():
+    for line in env_path.read_text().splitlines():
+        # Skip blanks and comments
+        if not line or line.strip().startswith("#"):
+            continue
+        # Split only on the first “=”
+        key, val = line.split("=", 1)
+        os.environ.setdefault(key, val)
+
 import pandas as pd
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
