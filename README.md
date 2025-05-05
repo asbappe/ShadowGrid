@@ -1,179 +1,131 @@
-🚨 ShadowGrid: Intelligent Threat Feed Aggregator & Visualizer
+🚨 **ShadowGrid**: Intelligent Threat Feed Aggregator & Visualizer
 
 ShadowGrid is a cybersecurity analytics platform that combines a custom honeypot with multiple external threat feeds, enriches the data, and visualizes it in real time via a Streamlit dashboard. Built for blue teams, threat analysts, and curious hackers, ShadowGrid delivers actionable insights into hostile traffic and IOCs.
 
-🏗️ Project Structure
+---
 
-Path
+## 🏗️ Project Structure
 
-Description
+| Path                        | Description                             |
+| --------------------------- | --------------------------------------- |
+| `ShadowGrid.py`             | Streamlit dashboard application         |
+| `requirements.txt`          | Python dependencies                     |
+| `honeypot/`                 | Honeypot engine and configuration       |
+| `honeypot/honeypot.py`      | Custom network listener + ingest client |
+| `honeypot/config.yaml`      | Ports, logging, and API settings        |
+| `feeds/`                    | Threat feed adapters                    |
+| `feeds/abuseipdb_feed.py`   | AbuseIPDB ingestion adapter             |
+| `feeds/otx_feed.py`         | AlienVault OTX ingestion adapter        |
+| `feeds/remote_honeypot.py`  | Internal honeypot ingestion stub        |
+| `enrichment/`               | Data enrichment modules                 |
+| `enrichment/geoip.py`       | GeoIP lookup module                     |
+| `enrichment/reputation.py`  | Threat reputation scoring               |
+| `enrichment/scoring.py`     | IOC freshness and scoring               |
+| `systemd/`                  | Example systemd unit files              |
+| `systemd/streamlit.service` | Streamlit dashboard systemd service     |
+| `systemd/honeypot.service`  | Honeypot systemd service                |
+| `refresh.sh`                | Auto-update & restart script            |
 
-ShadowGrid.py
+---
 
-Streamlit dashboard application
+## 📊 Key Features
 
-requirements.txt
+### 1. Multiple Threat Feeds Aggregated
 
-Python dependencies
+* 🔍 **AbuseIPDB**
+* 🦪 **AlienVault OTX**
+* 🕵️‍♂️ **Custom Honeypot** (DigitalOcean/AWS VPS)
 
-honeypot/
+### 2. Data Enrichment
 
-Honeypot engine and configuration
+* 🌍 **GeoIP Lookups** (Country, City, ASN)
+* 📡 **Threat Scoring** (AbuseIPDB, VT reputation)
+* 🕒 **IOC Freshness** (Timestamps & age)
 
-honeypot/honeypot.py
+### 3. Interactive Streamlit Dashboard
 
-Custom network listener + ingest client
+* 🌐 **Real-time Map** of threat activity
+* 📈 **IOC Timeline** chart
+* 📂 **Expandable Table** with metadata & filters
+* 🎛️ **Filters** by Country, Score, ASN, Feed Source
+* 🌑 **Clean Dark Theme**
 
-honeypot/config.yaml
+### 4. Features In Progress
 
-Ports, logging, and API settings
+* 🏷️ IOC Tagging & Threat Categories
+* ⚙️ Automated VT Enrichment Fallback
+* 🔗 Attacker Graph Clustering
+* 📦 Export to STIX / MISP
 
-feeds/
+---
 
-Threat feed adapters
+## 🚀 Getting Started
 
-feeds/abuseipdb_feed.py
+### Prerequisites
 
-AbuseIPDB ingestion adapter
+* **OS:** Ubuntu 20.04+ (systemd)
+* **Python:** 3.8+
+* **Ports:** Open inbound ports for honeypot (e.g., 22, 80, 443, custom) and outbound TCP/443
 
-feeds/otx_feed.py
+### 1. Clone and Install
 
-AlienVault OTX ingestion adapter
-
-feeds/remote_honeypot.py
-
-Internal honeypot ingestion stub
-
-enrichment/
-
-Data enrichment modules
-
-enrichment/geoip.py
-
-GeoIP lookup module
-
-enrichment/reputation.py
-
-Threat reputation scoring
-
-enrichment/scoring.py
-
-IOC freshness and scoring
-
-systemd/
-
-Example systemd unit files
-
-systemd/streamlit.service
-
-Streamlit dashboard systemd service
-
-systemd/honeypot.service
-
-Honeypot systemd service
-
-refresh.sh
-
-Auto-update & restart script
-
-📊 Key Features
-
-1. Multiple Threat Feeds Aggregated
-
-🔍 AbuseIPDB
-
-🦪 AlienVault OTX
-
-🕵️‍♂️ Custom Honeypot (DigitalOcean/AWS VPS)
-
-2. Data Enrichment
-
-🌍 GeoIP Lookups (Country, City, ASN)
-
-📡 Threat Scoring (AbuseIPDB, VT reputation)
-
-🕒 IOC Freshness (Timestamps & age)
-
-3. Interactive Streamlit Dashboard
-
-🌐 Real-time Map of threat activity
-
-📈 IOC Timeline chart
-
-📂 Expandable Table with metadata & filters
-
-🎛️ Filters by Country, Score, ASN, Feed Source
-
-🌑 Clean Dark Theme
-
-4. Features In Progress
-
-🏷️ IOC Tagging & Threat Categories
-
-⚙️ Automated VT Enrichment Fallback
-
-🔗 Attacker Graph Clustering
-
-📦 Export to STIX / MISP
-
-🚀 Getting Started
-
-Prerequisites
-
-OS: Ubuntu 20.04+ (systemd)
-
-Python: 3.8+
-
-Ports: Open inbound ports for honeypot (e.g., 22, 80, 443, custom) and outbound TCP/443
-
-1. Clone and Install
-
+```bash
 git clone https://github.com/asbappe/ShadowGrid.git
 cd ShadowGrid
 pip install -r requirements.txt
+```
 
-2. Configure API Keys & Settings
+### 2. Configure API Keys & Settings
 
-Copy honeypot/config.example.yaml → honeypot/config.yaml and adjust.
+* Copy `honeypot/config.example.yaml → honeypot/config.yaml` and adjust.
+* Alternatively create a `.env` in root:
 
-Alternatively create a .env in root:
+  ```ini
+  OTX_API_KEY=<your_otx_key>
+  ABUSEIPDB_API_KEY=<your_abuseipdb_key>
+  VT_API_KEY=<your_virustotal_key>
+  DASHBOARD_URL=https://shadowgridlabs.com/api/ingest
+  LOG_LEVEL=INFO
+  ```
 
-OTX_API_KEY=<your_otx_key>
-ABUSEIPDB_API_KEY=<your_abuseipdb_key>
-VT_API_KEY=<your_virustotal_key>
-DASHBOARD_URL=https://shadowgridlabs.com/api/ingest
-LOG_LEVEL=INFO
+### 3. Initial Pipeline Run
 
-3. Initial Pipeline Run
-
+```bash
 python run.py
+```
 
-(This will fetch & enrich feeds, outputting output/ShadowGrid_results.csv.)
+(This will fetch & enrich feeds, outputting `output/ShadowGrid_results.csv`.)
 
-4. Launch Dashboard
+### 4. Launch Dashboard
 
+```bash
 streamlit run ShadowGrid.py --server.port 8501
+```
 
-Navigate to http://<EC2_IP>:8501 or via reverse-proxy domain.
+Navigate to `http://<EC2_IP>:8501` or via reverse-proxy domain.
 
-🛡️ Honeypot Deployment (DigitalOcean or AWS)
+---
 
-SSH into your droplet/instance
+## 🛡️ Honeypot Deployment (DigitalOcean or AWS)
 
-Ensure ports (e.g. 8080 for API, 22/80/443 for honeypot) are open
+1. SSH into your droplet/instance
+2. Ensure ports (e.g. 8080 for API, 22/80/443 for honeypot) are open
+3. Run:
 
-Run:
+   ```bash
+   python3 honeypot/honeypot.py --config honeypot/config.yaml
+   ```
+4. The honeypot will post JSON to your dashboard API for real-time ingestion.
 
-python3 honeypot/honeypot.py --config honeypot/config.yaml
+---
 
-The honeypot will post JSON to your dashboard API for real-time ingestion.
+## ⚙️ Automation & Services
 
-⚙️ Automation & Services
+### Systemd Services
 
-Systemd Services
+Copy service files from `systemd/` → `/etc/systemd/system/`:
 
-Copy service files from systemd/ → /etc/systemd/system/:
-
+```ini
 # streamlit.service
 [Unit]
 Description=ShadowGrid Streamlit Dashboard
@@ -188,7 +140,9 @@ Environment="PATH=/usr/local/bin:/usr/bin"
 
 [Install]
 WantedBy=multi-user.target
+```
 
+```ini
 # honeypot.service
 [Unit]
 Description=ShadowGrid Honeypot
@@ -201,67 +155,67 @@ Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
+```
 
 Enable & start both:
 
+```bash
 sudo systemctl daemon-reload
 sudo systemctl enable streamlit.service honeypot.service
 sudo systemctl start  streamlit.service honeypot.service
+```
 
-Refresh Script
+### Refresh Script
 
-refresh.sh automates:
+`refresh.sh` automates:
 
-git pull
-
-python run.py
-
-Restart Streamlit
-
-Tail last 20 lines of streamlit.log
-
-Echo dashboard URL
+1. `git pull`
+2. `python run.py`
+3. Restart Streamlit
+4. Tail last 20 lines of `streamlit.log`
+5. Echo dashboard URL
 
 Add alias:
 
+```bash
 echo "alias refreshgrid='$(pwd)/refresh.sh'" >> ~/.bashrc
 source ~/.bashrc
+```
 
-📜 Logs & Monitoring
+---
 
-Streamlit: sudo journalctl -u streamlit.service -f
+## 📜 Logs & Monitoring
 
-Honeypot: sudo journalctl -u honeypot.service -f
+* Streamlit: `sudo journalctl -u streamlit.service -f`
+* Honeypot: `sudo journalctl -u honeypot.service -f`
+* Local files (if enabled in `config.yaml`)
 
-Local files (if enabled in config.yaml)
+---
 
-🐞 Troubleshooting
+## 🐞 Troubleshooting
 
-Port Conflicts: lsof -i TCP:8501
+* **Port Conflicts**: `lsof -i TCP:8501`
+* **AWS Security Groups**: Verify inbound/outbound rules
+* **Dependencies**: `pip install -r requirements.txt`
+* **Config Issues**: Check `config.yaml` and `.env`
 
-AWS Security Groups: Verify inbound/outbound rules
+---
 
-Dependencies: pip install -r requirements.txt
+## 🤝 Contributing
 
-Config Issues: Check config.yaml and .env
-
-🤝 Contributing
-
-Fork this repo
-
-Create a branch (git checkout -b feature-name)
-
-Commit changes (git commit -m "Add feature")
-
-Push (git push origin feature-name)
-
-Open a PR
+1. Fork this repo
+2. Create a branch (`git checkout -b feature-name`)
+3. Commit changes (`git commit -m "Add feature"`)
+4. Push (`git push origin feature-name`)
+5. Open a PR
 
 Please follow code style and include tests.
 
-📄 License & Credits
+---
 
-Released under the MIT License. See LICENSE.Built by Austin Bappe — seasoned cybersecurity professional.
+## 📄 License & Credits
+
+Released under the **MIT License**. See [LICENSE](LICENSE).
+Built by **Austin Bappe** — seasoned cybersecurity professional.
 
 Thanks to Streamlit, Plotly, MaxMind, and the open-source community!
-
