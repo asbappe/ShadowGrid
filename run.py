@@ -1,5 +1,25 @@
 
 import pandas as pd
+from datetime import datetime, timedelta
+
+CSV_PATH = "output/ShadowGrid_results.csv"
+MAX_AGE = timedelta(weeks=4)
+
+def trim_old_entries(path: str, timestamp_col="timestamp"):
+    df = pd.read_csv(path, parse_dates=[timestamp_col])
+    cutoff = datetime.utcnow() - MAX_AGE
+    df = df[df[timestamp_col] >= cutoff]
+    df.to_csv(path, index=False)
+
+def main():
+    # 1) fetch & enrich feeds, append to CSV
+    # … your existing logic …
+
+    # 2) then trim
+    trim_old_entries(CSV_PATH)
+
+if __name__ == "__main__":
+    main()
 from feeds.remote_honeypot import get_remote_honeypot_hits
 from feeds.otx_feed import get_otx_ips
 from enrichment.geoip import enrich_geoip
