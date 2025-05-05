@@ -1,159 +1,214 @@
-# 🚨 ShadowGrid: Intelligent Threat Feed Aggregator & Visualizer
+🚨 ShadowGrid: Intelligent Threat Feed Aggregator & Visualizer
 
-**ShadowGrid** is a cybersecurity analytics dashboard that aggregates, enriches, and visualizes malicious IP data from multiple sources — including your own honeypot. It's built for blue teams, threat analysts, and curious hackers looking to gain real-time insight into hostile traffic and IOCs.
+ShadowGrid is a cybersecurity analytics platform that combines a custom honeypot with multiple external threat feeds, enriches the data, and visualizes it in real time via a Streamlit dashboard. Built for blue teams, threat analysts, and curious hackers, ShadowGrid delivers actionable insights into hostile traffic and IOCs.
 
----
+🏗️ Project Structure
 
-## 📊 Features
-
-✅ **Multiple Threat Feeds Aggregated**
-- 🔍 [AbuseIPDB](https://www.abuseipdb.com/)
-- 🦪 [AlienVault OTX](https://otx.alienvault.com/)
-- 🕵️‍♂️ Custom **remote honeypot** hosted on a DigitalOcean VPS
-
-✅ **Data Enrichment**
-- 🌍 GeoIP lookups (Country, City, ASN)
-- 📡 Threat scoring (Abuse/VT reputation)
-- 🕒 IOC freshness with timestamps
-
-✅ **Interactive Dashboard (Streamlit)**
-- 🌐 Real-time map of threat activity
-- 📈 IOC timeline chart
-- 📂 Expandable table with IOC metadata
-- 🎛️ Filters: Country, Threat Score, ASN, Feed Source
-- 🌑 Clean dark theme
-
----
-
-## 📁 Project Structure
-
-```
 ShadowGrid/
-├── run.py                        ← Data pipeline: fetch, enrich, export
-├── app.py                        ← Main Streamlit dashboard
-├── feeds/
-│   ├── otx_feed.py
+├── ShadowGrid.py             ← Streamlit dashboard application
+├── requirements.txt          ← Python dependencies
+├── honeypot/                 ← Honeypot engine and config
+│   ├── honeypot.py           ← Custom network listener + ingest client
+│   └── config.yaml           ← Ports, logging, and API settings
+├── feeds/                    ← Threat feed adapters
 │   ├── abuseipdb_feed.py
-│   └── remote_honeypot.py
-├── enrichment/
+│   ├── otx_feed.py
+│   └── remote_honeypot.py    ← Internal honeypot ingestion stub
+├── enrichment/               ← Data enrichment modules
 │   ├── geoip.py
 │   ├── reputation.py
 │   └── scoring.py
-├── utils/
-│   └── config.py                ← API key management
-├── output/
-│   └── ShadowGrid_results.csv  ← Auto-generated results
-├── honeypot/ (on VPS)
-│   └── honeypot_server.py       ← Flask app + TCP listener
-└── README.md
-```
+├── systemd/                  ← Example systemd unit files
+│   ├── streamlit.service
+│   └── honeypot.service
+└── refresh.sh                ← Auto-update & restart script
 
----
+📊 Key Features
 
-## 🚀 Getting Started
+1. Multiple Threat Feeds Aggregated
 
-### 1. Clone the repo
+🔍 AbuseIPDB
 
-```bash
-git clone https://github.com/yourusername/ShadowGrid.git
+🦪 AlienVault OTX
+
+🕵️‍♂️ Custom Honeypot (DigitalOcean/AWS VPS)
+
+2. Data Enrichment
+
+🌍 GeoIP Lookups (Country, City, ASN)
+
+📡 Threat Scoring (AbuseIPDB, VT reputation)
+
+🕒 IOC Freshness (Timestamps & age)
+
+3. Interactive Streamlit Dashboard
+
+🌐 Real-time Map of threat activity
+
+📈 IOC Timeline chart
+
+📂 Expandable Table with metadata & filters
+
+🎛️ Filters by Country, Score, ASN, Feed Source
+
+🌑 Clean Dark Theme
+
+4. Features In Progress
+
+🏷️ IOC Tagging & Threat Categories
+
+⚙️ Automated VT Enrichment Fallback
+
+🔗 Attacker Graph Clustering
+
+📦 Export to STIX / MISP
+
+🚀 Getting Started
+
+Prerequisites
+
+OS: Ubuntu 20.04+ (systemd)
+
+Python: 3.8+
+
+Ports: Open inbound ports for honeypot (e.g., 22, 80, 443, custom) and outbound TCP/443
+
+1. Clone and Install
+
+git clone https://github.com/asbappe/ShadowGrid.git
 cd ShadowGrid
-```
-
-### 2. Install requirements
-
-```bash
 pip install -r requirements.txt
-```
 
-### 3. Set up your API keys
+2. Configure API Keys & Settings
 
-Create a `.env` file in the root folder with:
+Copy honeypot/config.example.yaml → honeypot/config.yaml and adjust.
 
-```
-OTX_API_KEY=your_otx_key
-ABUSEIPDB_API_KEY=your_abuseipdb_key
-VT_API_KEY=your_virustotal_key
-```
+Alternatively create a .env in root:
 
-Or set them directly in `utils/config.py`.
+OTX_API_KEY=<your_otx_key>
+ABUSEIPDB_API_KEY=<your_abuseipdb_key>
+VT_API_KEY=<your_virustotal_key>
+DASHBOARD_URL=https://shadowgridlabs.com/api/ingest
+LOG_LEVEL=INFO
 
----
+3. Initial Pipeline Run
 
-### 4. Run the pipeline
-
-Fetch + enrich data:
-
-```bash
 python run.py
-```
 
-This will update `output/ShadowGrid_results.csv`.
+(This will fetch & enrich feeds, outputting output/ShadowGrid_results.csv.)
 
----
+4. Launch Dashboard
 
-### 5. Launch the dashboard
+streamlit run ShadowGrid.py --server.port 8501
 
-```bash
-streamlit run app.py
-```
+Navigate to http://<EC2_IP>:8501 or via reverse-proxy domain.
 
-Navigate to `http://localhost:8501`.
+🛡️ Honeypot Deployment (DigitalOcean or AWS)
 
----
+SSH into your droplet/instance
 
-## 🧚 Honeypot Setup (DigitalOcean VPS)
+Ensure ports (e.g. 8080 for API, 22/80/443 for honeypot) are open
 
-Run this on your cloud droplet:
+Run:
 
-```bash
-python3 honeypot_server.py
-```
+python3 honeypot/honeypot.py --config honeypot/config.yaml
 
-Ensure port `8080` (Flask API) and `2222` (honeypot listener) are open to inbound traffic. Data is automatically synced to the dashboard.
+The honeypot will post JSON to your dashboard API for real-time ingestion.
 
----
+⚙️ Automation & Services
 
-refresh.sh script:
-1. Kills any existing Streamlit process
-2.  Runs git pull to get the latest ShadowGrid code
-3. Executes run.py to enrich honeypot hits
-4. Restarts the dashboard using nohup
-5. Tails the last 20 lines of streamlit.log
-6. Prints the public EC2 IP with the dashboard link
+Systemd Services
 
-How to use:
-```bash
-mv refresh.sh ~/ShadowGrid/
-chmod +x ~/ShadowGrid/refresh.sh 
-echo "alias refreshgrid='~/ShadowGrid/refresh.sh'" >> ~/.bashrc
+Copy service files from systemd/ → /etc/systemd/system/:
+
+# streamlit.service
+[Unit]
+Description=ShadowGrid Streamlit Dashboard
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/ShadowGrid
+ExecStart=/usr/local/bin/streamlit run ShadowGrid.py --server.port 8501
+Restart=on-failure
+Environment="PATH=/usr/local/bin:/usr/bin"
+
+[Install]
+WantedBy=multi-user.target
+
+# honeypot.service
+[Unit]
+Description=ShadowGrid Honeypot
+After=network.target
+
+[Service]
+User=ubuntu
+ExecStart=/usr/bin/python3 /home/ubuntu/ShadowGrid/honeypot/honeypot.py --config /home/ubuntu/ShadowGrid/honeypot/config.yaml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+Enable & start both:
+
+sudo systemctl daemon-reload
+sudo systemctl enable streamlit.service honeypot.service
+sudo systemctl start  streamlit.service honeypot.service
+
+Refresh Script
+
+refresh.sh automates:
+
+git pull
+
+python run.py
+
+Restart Streamlit
+
+Tail last 20 lines of streamlit.log
+
+Echo dashboard URL
+
+Add alias:
+
+echo "alias refreshgrid='$(pwd)/refresh.sh'" >> ~/.bashrc
 source ~/.bashrc
-```
 
-Now just run:
-```bash
-refreshgrid
-```
+📜 Logs & Monitoring
 
-## 🗕️ Features In Progress
+Streamlit: sudo journalctl -u streamlit.service -f
 
-- IOC tagging & threat categories  
-- Automated VT enrichment fallback  
-- Graph-based attacker clustering  
-- Export to STIX or MISP
+Honeypot: sudo journalctl -u honeypot.service -f
 
----
+Local files (if enabled in config.yaml)
 
-## 🛡️ License
+🐞 Troubleshooting
 
-MIT — Free for personal, academic, or professional use.
+Port Conflicts: lsof -i TCP:8501
 
----
+AWS Security Groups: Verify inbound/outbound rules
 
-## 🤝 Credits
+Dependencies: pip install -r requirements.txt
 
-Built by Austin Bappe —  Seasoned Cybersecurity Professional.  
-Special thanks to [Streamlit](https://streamlit.io/), [Plotly](https://plotly.com/), [MaxMind](https://www.maxmind.com/), and the open-source community.
+Config Issues: Check config.yaml and .env
 
----
+🤝 Contributing
 
-**🔗 Let's connect on [LinkedIn](https://www.linkedin.com/in/austinbappe/)** — open to security roles!
+Fork this repo
+
+Create a branch (git checkout -b feature-name)
+
+Commit changes (git commit -m "Add feature")
+
+Push (git push origin feature-name)
+
+Open a PR
+
+Please follow code style and include tests.
+
+📄 License & Credits
+
+Released under the MIT License. See LICENSE.Built by Austin Bappe — seasoned cybersecurity professional.
+
+Thanks to Streamlit, Plotly, MaxMind, and the open-source community!
+
