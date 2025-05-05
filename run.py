@@ -1,11 +1,30 @@
-
+import os
 import pandas as pd
 from datetime import datetime, timedelta
 
-CSV_PATH = "output/ShadowGrid_results.csv"
-MAX_AGE = timedelta(weeks=4)
+# Configuration
+CSV_DIR  = "output"
+CSV_PATH = os.path.join(CSV_DIR, "ShadowGrid_results.csv")
+MAX_AGE  = timedelta(weeks=4)
+TIMESTAMP_COL = "timestamp"
 
-def trim_old_entries(path: str, timestamp_col="timestamp"):
+# Ensure output directory exists
+os.makedirs(CSV_DIR, exist_ok=True)
+
+# If this is the first ever run, create an empty CSV
+if not os.path.exists(CSV_PATH):
+    # TODO: adjust these column names to match your pipeline’s actual schema
+    initial_columns = [
+        TIMESTAMP_COL,
+        "ip",
+        "feed_source",
+        "country",
+        "asn",
+        "threat_score",
+    ]
+    pd.DataFrame(columns=initial_columns).to_csv(CSV_PATH, index=False)
+
+def trim_old_entries(path: str, timestamp_col=TIMESTAMP_COL):
     df = pd.read_csv(path, parse_dates=[timestamp_col])
     cutoff = datetime.utcnow() - MAX_AGE
     df = df[df[timestamp_col] >= cutoff]
@@ -20,13 +39,14 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 from feeds.remote_honeypot import get_remote_honeypot_hits
 from feeds.otx_feed import get_otx_ips
 from enrichment.geoip import enrich_geoip
 from enrichment.reputation import enrich_reputation
 from enrichment.scoring import calculate_threat_score
 from utils.config import OTX_API_KEY, ABUSEIPDB_API_KEY, VT_API_KEY
-import os
+
 
 print("🪤 Fetching IPs from honeypot...")
 honeypot_df = get_remote_honeypot_hits("http://67.205.131.5:8080/all_hits")
