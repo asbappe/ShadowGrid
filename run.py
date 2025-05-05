@@ -65,7 +65,7 @@ from utils.config import OTX_API_KEY, ABUSEIPDB_API_KEY, VT_API_KEY
 
 
 print("🪤 Fetching IPs from honeypot...")
-honeypot_df = get_remote_honeypot_hits("http://67.205.131.5:8080/all_hits")
+honeypot_df = get_remote_honeypot_hits()
 
 if honeypot_df.empty:
     print("No honeypot hits found.")
